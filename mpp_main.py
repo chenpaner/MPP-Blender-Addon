@@ -38,7 +38,7 @@ class TextDisplay:
         blf.draw(font_id, self.text)
 
         # Text body
-        blf.color(font_id, 1, 1, 1, 1)
+        blf.color(font_id, 1, 0.55, 0, 1)
         blf.position(font_id, self.x, self.y, 0)
         blf.size(font_id, font_size)#, dpi
         blf.draw(font_id, self.text)
@@ -179,7 +179,7 @@ class MPP_OT_Pick(Operator):
             bpy.ops.object.mode_set(mode=current_mode)
 
         if picked_material:
-            self.report({'INFO'}, f"Picked Material: {picked_material.name}")
+            self.report({'INFO'}, f"复制材质: {picked_material.name}")
 
             self.text_display = TextDisplay(event.mouse_region_x, event.mouse_region_y, f"Pick: {picked_material.name}")
             self._handle = bpy.types.SpaceView3D.draw_handler_add(self.text_display.draw, (context,), 'WINDOW', 'POST_PIXEL')
@@ -215,9 +215,9 @@ def paste_material_to_edit_mode_object(obj, picked_material):
     bmesh.update_edit_mesh(obj.data)
     return True
 
-# テキストの表示条件をチェックする関数
+# テキストの表示条件をチェックする関数 检查文本显示条件的函数
 def should_display_text(selected_objects, mouse_x, mouse_y):
-    # マウス直下にオブジェクトが存在する場合は表示する
+    # マウス直下にオブジェクトが存在する場合は表示する 鼠标正下方有对象时显示
     region = bpy.context.region
     rv3d = bpy.context.region_data
     mouse_coord = (mouse_x, mouse_y)
@@ -225,13 +225,13 @@ def should_display_text(selected_objects, mouse_x, mouse_y):
     ray_origin = view3d_utils.region_2d_to_origin_3d(region, rv3d, mouse_coord)
     
     scene = bpy.context.scene
-    depsgraph = bpy.context.evaluated_depsgraph_get()  # Depsgraphオブジェクトを取得
+    depsgraph = bpy.context.evaluated_depsgraph_get()  # 获取Depsgraph对象Depsgraphオブジェクトを取得
     hit, location, normal, index, object, matrix = scene.ray_cast(depsgraph, ray_origin, view_vector)
 
     if hit:
         return True
 
-    # 選択されたオブジェクトがない場合は表示しない
+    # 選択されたオブジェクトがない場合は表示しない没有被选择的对象时不显示
     if not selected_objects:
         return False
 
@@ -382,7 +382,7 @@ class MPP_OT_Paste(Operator):
                         else:
                             obj.data.materials.append(picked_material)
 
-                        self.report({'INFO'}, f"Pasted Material: {picked_material.name} to {obj.name}")
+                        self.report({'INFO'}, f"粘贴材质: {picked_material.name} to {obj.name}")
 
             bpy.ops.ed.undo_push(message="Paste Material")
 
